@@ -204,8 +204,40 @@ function extractEmails(str) {
  *             '└──────────┘\n'
  *
  */
-function getRectangleString(/* width, height */) {
-  throw new Error('Not implemented');
+function getRectangleString(width, height) {
+  const resultArr = [];
+  for (let i = 1; i <= height; i += 1) {
+    let result = '';
+    for (let j = 1; j <= width; j += 1) {
+      if (i === 1) {
+        if (j === 1) {
+          result += '┌';
+        } else if (j === width) {
+          result += '┐';
+        } else {
+          result += '─';
+        }
+      }
+      if (i === height) {
+        if (j === 1) {
+          result += '└';
+        } else if (j === width) {
+          result += '┘';
+        } else {
+          result += '─';
+        }
+      }
+      if (i !== 1 && i !== height) {
+        if (j === 1 || j === width) {
+          result += '│';
+        } else {
+          result += ' ';
+        }
+      }
+    }
+    resultArr.push(`${result}\n`);
+  }
+  return resultArr.join('');
 }
 
 
@@ -225,8 +257,15 @@ function getRectangleString(/* width, height */) {
  *    => 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
  *
  */
-function encodeToRot13(/* str */) {
-  throw new Error('Not implemented');
+function encodeToRot13(str) {
+  const USUAL_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  const ROT13_ALPHABET = 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm';
+  let result = '';
+  for (let i = 0; i < str.length; i += 1) {
+    const originalSymbolIndex = USUAL_ALPHABET.indexOf(str[i]);
+    result += ROT13_ALPHABET[originalSymbolIndex] ? ROT13_ALPHABET[originalSymbolIndex] : str[i];
+  }
+  return result;
 }
 
 /**
@@ -242,8 +281,8 @@ function encodeToRot13(/* str */) {
  *   isString('test') => true
  *   isString(new String('test')) => true
  */
-function isString(/* value */) {
-  throw new Error('Not implemented');
+function isString(value) {
+  return typeof value === 'string' || value instanceof String;
 }
 
 
@@ -271,8 +310,35 @@ function isString(/* value */) {
  *   'Q♠' => 50
  *   'K♠' => 51
  */
-function getCardId(/* value */) {
-  throw new Error('Not implemented');
+function getCardId(value) {
+  let result = 0;
+  const baseLineLength = 13;
+  const SUIT_DATA_BASE = [
+    { mark: '♣', value: 0 },
+    { mark: '♦', value: 1 },
+    { mark: '♥', value: 2 },
+    { mark: '♠', value: 3 }];
+  const VALUES_DATA_BASE = [
+    { letter: 'A', value: 0 },
+    { letter: 'J', value: 10 },
+    { letter: 'Q', value: 11 },
+    { letter: 'K', value: 12 }];
+  SUIT_DATA_BASE.forEach((el) => {
+    if (value.endsWith(el.mark)) {
+      result = baseLineLength * el.value;
+    }
+  });
+  const numberCardValue = parseInt(value, 10);
+  if (numberCardValue) {
+    result += (numberCardValue - 1);
+  } else {
+    VALUES_DATA_BASE.forEach((el) => {
+      if (value.startsWith(el.letter)) {
+        result += el.value;
+      }
+    });
+  }
+  return result;
 }
 
 
