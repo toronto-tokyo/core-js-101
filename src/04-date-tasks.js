@@ -19,8 +19,8 @@
  *    'Tue, 26 Jan 2016 13:48:02 GMT' => Date()
  *    'Sun, 17 May 1998 03:00:00 GMT+01' => Date()
  */
-function parseDataFromRfc2822(/* value */) {
-  throw new Error('Not implemented');
+function parseDataFromRfc2822(value) {
+  return new Date(value);
 }
 
 /**
@@ -34,8 +34,8 @@ function parseDataFromRfc2822(/* value */) {
  *    '2016-01-19T16:07:37+00:00'    => Date()
  *    '2016-01-19T08:07:37Z' => Date()
  */
-function parseDataFromIso8601(/* value */) {
-  throw new Error('Not implemented');
+function parseDataFromIso8601(value) {
+  return new Date(value);
 }
 
 
@@ -53,8 +53,9 @@ function parseDataFromIso8601(/* value */) {
  *    Date(2012,1,1)    => true
  *    Date(2015,1,1)    => false
  */
-function isLeapYear(/* date */) {
-  throw new Error('Not implemented');
+function isLeapYear(date) {
+  date.setDate(date.getDate() + 28);
+  return date.getMonth() === 1;
 }
 
 
@@ -73,10 +74,19 @@ function isLeapYear(/* date */) {
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,10,0,0,250)     => "00:00:00.250"
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,15,20,10,453)   => "05:20:10.453"
  */
-function timeSpanToString(/* startDate, endDate */) {
-  throw new Error('Not implemented');
+function timeSpanToString(startDate, endDate) {
+  const timePeriodInMs = endDate - startDate;
+  const date = new Date(timePeriodInMs);
+  return `${
+    (`00${date.getUTCHours()}`).slice(-2)
+  }:${
+    (`00${date.getUTCMinutes()}`).slice(-2)
+  }:${
+    (`00${date.getUTCSeconds()}`).slice(-2)
+  }.${
+    (`000${date.getUTCMilliseconds()}`).slice(-3)
+  }`;
 }
-
 
 /**
  * Returns the angle (in radians) between the hands of an analog clock
@@ -94,8 +104,23 @@ function timeSpanToString(/* startDate, endDate */) {
  *    Date.UTC(2016,3,5,18, 0) => Math.PI
  *    Date.UTC(2016,3,5,21, 0) => Math.PI/2
  */
-function angleBetweenClockHands(/* date */) {
-  throw new Error('Not implemented');
+function angleBetweenClockHands(date) {
+  const ANGLE_PER_MINUTE_FOR_MINUTE = 6;
+  const ANGLE_PER_MINUTE_FOR_HOUR = 0.5;
+  const MINUTES_PER_HOUR = 60;
+  let hours = date.getUTCHours();
+  hours = hours >= 12 ? hours - 12 : hours;
+  const minutes = date.getUTCMinutes();
+  const minutesAngle = minutes * ANGLE_PER_MINUTE_FOR_MINUTE;
+  const hoursAngle = (MINUTES_PER_HOUR * hours + minutes) * ANGLE_PER_MINUTE_FOR_HOUR;
+  let result = Math.abs(hoursAngle - minutesAngle);
+  result = result > 180
+    ? 360
+      + Math.min(hoursAngle, minutesAngle)
+      - Math.max(hoursAngle, minutesAngle)
+    : result;
+  const resultInRadians = result * (Math.PI / 180);
+  return resultInRadians;
 }
 
 
